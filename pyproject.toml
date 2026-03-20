@@ -18,6 +18,8 @@ keywords = [
   "security",
   "prompt-injection",
   "guardrails",
+  "mcp",
+  "model-context-protocol",
 ]
 classifiers = [
   "Development Status :: 3 - Alpha",
@@ -31,6 +33,11 @@ classifiers = [
   "License :: OSI Approved :: MIT License",
 ]
 dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/jefftengan/policyrail"
+Repository = "https://github.com/jefftengan/policyrail"
+Issues = "https://github.com/jefftengan/policyrail/issues"
 
 [project.optional-dependencies]
 dev = ["pytest>=8.0"]

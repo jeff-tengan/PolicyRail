@@ -15,6 +15,7 @@ from .models import (
     SecureRequest,
     SecureResponse,
     ToolCall,
+    ToolExecutionResult,
     ToolSpec,
 )
 from .partitioning import ContextPartitioner
@@ -39,5 +40,6 @@ __all__ = [
     "SecureRequest",
     "SecureResponse",
     "ToolCall",
+    "ToolExecutionResult",
     "ToolSpec",
 ]

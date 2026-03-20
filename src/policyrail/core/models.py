@@ -67,6 +67,15 @@ class ToolCall:
 
 
 @dataclass(slots=True)
+class ToolExecutionResult:
+    tool_name: str
+    arguments: dict[str, Any] = field(default_factory=dict)
+    success: bool = True
+    output: Any = None
+    metadata: dict[str, Any] = field(default_factory=dict)
+
+
+@dataclass(slots=True)
 class PolicyDecision:
     status: Decision
     reasons: list[str] = field(default_factory=list)
@@ -104,6 +113,7 @@ class SecureResponse:
     decision: PolicyDecision
     output_validation: OutputValidation
     tool_call: ToolCall | None = None
+    tool_result: ToolExecutionResult | None = None
     audit_id: str | None = None
     envelope: PromptEnvelope | None = None
     model_metadata: dict[str, Any] = field(default_factory=dict)

@@ -84,6 +84,15 @@ Use `ToolSpec` to classify tools into three broad categories:
 
 The policy layer should decide on tool execution, not the model alone.
 
+For MCP scenarios, PolicyRail includes a dedicated integration layer:
+
+- `JSONRPCMCPClient` for `tools/list` and `tools/call`
+- `MCPToolRegistry` to translate discovered MCP tools into `ToolSpec`
+- `MCPToolExecutor` to execute approved MCP tool calls through the pipeline
+- `InMemoryMCPTransport` for tests and local integration work
+- `StdioMCPTransport` for subprocess-based MCP servers
+- `StreamableHTTPMCPTransport` for HTTP MCP servers with session support
+
 ### 4. Output Validation
 
 `OutputValidator` is the last guardrail before the response exits the library. This is the right place to add:

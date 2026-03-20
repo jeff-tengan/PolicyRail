@@ -16,6 +16,7 @@ This repository does not try to be a magical security layer. It provides a compa
 - JSONL audit trails for observability and incident review
 - a reusable secure pipeline with a provider-agnostic `LLMAdapter`
 - first-class remote preflight adapters for major LLM providers
+- a generic MCP layer for discovering, allowlisting, and executing MCP tools
 - Python packaging for use as a shared library across multiple projects
 
 ## Design Principles
@@ -92,7 +93,7 @@ Consume the package from another project:
 
 ```toml
 dependencies = [
-  "policyrail-ai>=0.4.0,<1.0.0",
+  "policyrail-ai>=0.5.0,<1.0.0",
 ]
 ```
 
@@ -247,6 +248,60 @@ If a remote SDK is not installed, credentials are missing, or the remote judge r
 ## Runtime Model Integration
 
 PolicyRail is not limited to preflight judges. The main generation path is also provider-agnostic through `LLMAdapter`, so you can connect OpenAI, Azure OpenAI, Anthropic, Gemini, Bedrock, or an internal gateway for response generation while reusing the same guardrails pipeline.
+
+## MCP Compatibility
+
+PolicyRail now includes a generic MCP integration layer for tool discovery and execution.
+
+Main primitives:
+
+- `JSONRPCMCPClient`: transport-agnostic client for the standard `tools/list` and `tools/call` methods
+- `MCPToolRegistry`: converts discovered MCP tools into `ToolSpec` entries with least-privilege defaults
+- `MCPToolExecutor`: executes approved `ToolCall`s through MCP and returns structured `ToolExecutionResult`
+- `InMemoryMCPTransport`: test-friendly transport for local and CI scenarios
+- `StdioMCPTransport`: subprocess-based adapter for MCP servers exposed over stdio
+- `StreamableHTTPMCPTransport` and `HTTPMCPTransport`: adapters for Streamable HTTP MCP servers
+
+Minimal example:
+
+```python
+from policyrail import (
+    JSONRPCMCPClient,
+    InMemoryMCPTransport,
+    MCPToolExecutor,
+    MCPToolPolicy,
+    MCPToolRegistry,
+    PolicyEngine,
+    SecureGenAIPipeline,
+)
+
+transport = InMemoryMCPTransport()
+transport.register_tool(
+    name="search_policy_docs",
+    description="Search approved policy documents.",
+    handler=lambda arguments: {
+        "content": [{"type": "text", "text": "Password Policy"}],
+        "structuredContent": {"matches": [{"title": "Password Policy"}]},
+    },
+)
+
+client = JSONRPCMCPClient(transport)
+registry = MCPToolRegistry(
+    client,
+    tool_policies={
+        "search_policy_docs": MCPToolPolicy(
+            sensitive=False,
+            requires_human_approval=False,
+            max_risk_score=35,
+        )
+    },
+)
+
+pipeline = SecureGenAIPipeline(
+    policy_engine=PolicyEngine(registry.build_tool_specs()),
+    tool_executor=MCPToolExecutor(client, server_name="policy-kb"),
+)
+```
 
 ## Adopting PolicyRail in a New Project
 

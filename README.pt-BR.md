@@ -16,6 +16,7 @@ O repositorio nao tenta vender uma camada "magica" de seguranca. Ele entrega um 
 - trilha de auditoria em JSONL
 - pipeline segura reutilizavel com `LLMAdapter` agnostico ao provedor
 - adapters de preflight prontos para os principais providers de LLM
+- camada MCP generica para descoberta, allowlist e execucao de tools MCP
 - empacotamento Python para uso como biblioteca compartilhada
 
 ## Principios de Design
@@ -92,7 +93,7 @@ Consumir em outro projeto:
 
 ```toml
 dependencies = [
-  "policyrail-ai>=0.4.0,<1.0.0",
+  "policyrail-ai>=0.5.0,<1.0.0",
 ]
 ```
 
@@ -247,6 +248,19 @@ Se o SDK remoto nao estiver instalado, se faltarem credenciais ou se o judge rem
 ## Integracao com o Modelo Principal
 
 O `PolicyRail` nao e apenas um preflight judge. O caminho principal de geracao tambem e agnostico ao provider via `LLMAdapter`, entao voce pode conectar OpenAI, Azure OpenAI, Anthropic, Gemini, Bedrock ou um gateway interno sem reescrever os guardrails.
+
+## Compatibilidade com MCP
+
+O `PolicyRail` agora inclui uma camada MCP generica para descoberta e execucao de tools.
+
+Primitivas principais:
+
+- `JSONRPCMCPClient`: cliente agnostico ao transporte para os metodos `tools/list` e `tools/call`
+- `MCPToolRegistry`: converte tools MCP descobertas em `ToolSpec` com default de minimo privilegio
+- `MCPToolExecutor`: executa `ToolCall`s aprovadas e devolve `ToolExecutionResult`
+- `InMemoryMCPTransport`: transporte voltado a testes locais e CI
+- `StdioMCPTransport`: adapter baseado em subprocesso para servidores MCP expostos via stdio
+- `StreamableHTTPMCPTransport` e `HTTPMCPTransport`: adapters para servidores MCP via Streamable HTTP
 
 ## Como Adotar em um Novo Projeto
 

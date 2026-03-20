@@ -84,6 +84,15 @@ Use `ToolSpec` para classificar tools em tres grupos amplos:
 
 A decisao de executar uma tool precisa ficar na camada de policy, nao apenas no modelo.
 
+Para cenarios com MCP, o `PolicyRail` inclui uma camada dedicada:
+
+- `JSONRPCMCPClient` para `tools/list` e `tools/call`
+- `MCPToolRegistry` para traduzir tools MCP descobertas em `ToolSpec`
+- `MCPToolExecutor` para executar tool calls aprovadas pelo pipeline
+- `InMemoryMCPTransport` para testes e integracao local
+- `StdioMCPTransport` para servidores MCP baseados em subprocesso
+- `StreamableHTTPMCPTransport` para servidores MCP sobre HTTP com suporte a sessao
+
 ### 4. Validacao de Saida
 
 `OutputValidator` e o ultimo guardrail antes da resposta deixar a biblioteca. Este e o lugar natural para incluir:

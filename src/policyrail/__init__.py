@@ -16,6 +16,7 @@ from .core.models import (
     SecureRequest,
     SecureResponse,
     ToolCall,
+    ToolExecutionResult,
     ToolSpec,
 )
 from .core.partitioning import ContextPartitioner
@@ -34,8 +35,24 @@ from .integrations import (
     build_preflight_classifier,
     build_preflight_classifier_from_env,
 )
+from .mcp import (
+    DEFAULT_MCP_PROTOCOL_VERSION,
+    HTTPMCPTransport,
+    InMemoryMCPTransport,
+    JSONRPCMCPClient,
+    MCPClient,
+    MCPTool,
+    MCPToolExecutor,
+    MCPToolPolicy,
+    MCPToolRegistry,
+    MCPToolResult,
+    MCPTransport,
+    MCPTransportSessionExpired,
+    StdioMCPTransport,
+    StreamableHTTPMCPTransport,
+)
 from .observability.audit import JsonAuditLogger
-from .pipeline.secure_pipeline import LLMAdapter, MockLLMAdapter, SecureGenAIPipeline
+from .pipeline.secure_pipeline import LLMAdapter, MockLLMAdapter, SecureGenAIPipeline, ToolExecutor
 
 __all__ = [
     "AnthropicPreflightClassifier",
@@ -44,13 +61,25 @@ __all__ = [
     "CallableVerdictClassifier",
     "ContextPartitioner",
     "CallablePreflightClassifier",
+    "DEFAULT_MCP_PROTOCOL_VERSION",
     "DEFAULT_LLM_JUDGE_SYSTEM_PROMPT",
     "DEFAULT_OPENAI_PREFLIGHT_PROMPT",
     "GoogleGenAIPreflightClassifier",
+    "HTTPMCPTransport",
+    "InMemoryMCPTransport",
+    "JSONRPCMCPClient",
     "JsonAuditLogger",
     "LLMAdapter",
     "LLMResponse",
     "LightweightNLPClassifier",
+    "MCPClient",
+    "MCPTool",
+    "MCPToolExecutor",
+    "MCPToolPolicy",
+    "MCPToolRegistry",
+    "MCPToolResult",
+    "MCPTransport",
+    "MCPTransportSessionExpired",
     "MockLLMAdapter",
     "OpenAIPreflightClassifier",
     "OutputValidation",
@@ -68,7 +97,11 @@ __all__ = [
     "SecureRequest",
     "SecureResponse",
     "ToolCall",
+    "ToolExecutor",
+    "ToolExecutionResult",
     "ToolSpec",
+    "StdioMCPTransport",
+    "StreamableHTTPMCPTransport",
     "build_preflight_classifier",
     "build_preflight_classifier_from_env",
 ]

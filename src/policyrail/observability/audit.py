@@ -7,7 +7,14 @@ from pathlib import Path
 from textwrap import shorten
 from uuid import uuid4
 
-from ..core.models import OutputValidation, PolicyDecision, RiskAssessment, SecureRequest, ToolCall
+from ..core.models import (
+    OutputValidation,
+    PolicyDecision,
+    RiskAssessment,
+    SecureRequest,
+    ToolCall,
+    ToolExecutionResult,
+)
 
 
 class JsonAuditLogger:
@@ -28,6 +35,7 @@ class JsonAuditLogger:
         output_validation: OutputValidation,
         response_text: str,
         tool_call: ToolCall | None,
+        tool_result: ToolExecutionResult | None = None,
     ) -> str:
         payload = {
             "event_id": str(uuid4()),
@@ -51,6 +59,9 @@ class JsonAuditLogger:
             "decision_reasons": decision.reasons,
             "tool_name": tool_call.name if tool_call else None,
             "tool_allowed": decision.allow_tool_execution,
+            "tool_execution_success": tool_result.success if tool_result else None,
+            "tool_execution_metadata": tool_result.metadata if tool_result else {},
+            "tool_output_preview": self._sanitize(repr(tool_result.output)) if tool_result else None,
             "output_passed": output_validation.passed,
             "output_violations": output_validation.violations,
             "response_preview": self._sanitize(response_text),

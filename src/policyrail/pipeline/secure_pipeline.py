@@ -13,6 +13,7 @@ from ..core.models import (
     SecureRequest,
     SecureResponse,
     ToolCall,
+    ToolExecutionResult,
 )
 from ..core.partitioning import ContextPartitioner
 from ..core.policies import PolicyEngine
@@ -22,6 +23,11 @@ from ..observability.audit import JsonAuditLogger
 
 class LLMAdapter(Protocol):
     def generate(self, envelope: PromptEnvelope) -> LLMResponse:
+        ...
+
+
+class ToolExecutor(Protocol):
+    def execute(self, tool_call: ToolCall) -> ToolExecutionResult:
         ...
 
 
@@ -78,6 +84,7 @@ class SecureGenAIPipeline:
         output_validator: OutputValidator | None = None,
         audit_logger: JsonAuditLogger | None = None,
         llm_adapter: LLMAdapter | None = None,
+        tool_executor: ToolExecutor | None = None,
     ) -> None:
         self.detector = detector or PromptInjectionDetector()
         self.partitioner = partitioner or ContextPartitioner()
@@ -85,6 +92,7 @@ class SecureGenAIPipeline:
         self.output_validator = output_validator or OutputValidator()
         self.audit_logger = audit_logger or JsonAuditLogger()
         self.llm_adapter = llm_adapter or MockLLMAdapter()
+        self.tool_executor = tool_executor
 
     def process(self, request: SecureRequest) -> SecureResponse:
         envelope = self.partitioner.build_envelope(request)
@@ -102,6 +110,7 @@ class SecureGenAIPipeline:
                 ),
                 response_text="Solicitacao bloqueada pela policy de seguranca.",
                 tool_call=None,
+                tool_result=None,
                 model_metadata={},
             )
 
@@ -121,8 +130,18 @@ class SecureGenAIPipeline:
                 output_validation=output_validation,
                 response_text="A saida do modelo foi retida por potencial vazamento de informacao sensivel.",
                 tool_call=None,
+                tool_result=None,
                 model_metadata=llm_response.metadata,
             )
+
+        tool_result = self._execute_tool(tool_call)
+        model_metadata = dict(llm_response.metadata)
+        if tool_result is not None:
+            model_metadata["tool_execution"] = {
+                "tool_name": tool_result.tool_name,
+                "success": tool_result.success,
+                "metadata": dict(tool_result.metadata),
+            }
 
         return self._finalize_response(
             request=request,
@@ -132,7 +151,8 @@ class SecureGenAIPipeline:
             output_validation=output_validation,
             response_text=response_text,
             tool_call=tool_call,
-            model_metadata=llm_response.metadata,
+            tool_result=tool_result,
+            model_metadata=model_metadata,
         )
 
     def _assess_risk(self, request: SecureRequest) -> RiskAssessment:
@@ -173,6 +193,7 @@ class SecureGenAIPipeline:
         output_validation: OutputValidation,
         response_text: str,
         tool_call: ToolCall | None,
+        tool_result: ToolExecutionResult | None,
         model_metadata: dict | None = None,
     ) -> SecureResponse:
         response = SecureResponse(
@@ -182,6 +203,7 @@ class SecureGenAIPipeline:
             decision=decision,
             output_validation=output_validation,
             tool_call=tool_call,
+            tool_result=tool_result,
             envelope=envelope,
             model_metadata=dict(model_metadata or {}),
         )
@@ -192,8 +214,27 @@ class SecureGenAIPipeline:
             output_validation=output_validation,
             response_text=response_text,
             tool_call=tool_call,
+            tool_result=tool_result,
         )
         return response
+
+    def _execute_tool(self, tool_call: ToolCall | None) -> ToolExecutionResult | None:
+        if tool_call is None or self.tool_executor is None:
+            return None
+        try:
+            return self.tool_executor.execute(tool_call)
+        except Exception as exc:
+            return ToolExecutionResult(
+                tool_name=tool_call.name,
+                arguments=dict(tool_call.arguments),
+                success=False,
+                output=None,
+                metadata={
+                    "executor": type(self.tool_executor).__name__,
+                    "error": exc.__class__.__name__,
+                    "detail": str(exc),
+                },
+            )
 
     def _escalate_output_violation(
         self,
