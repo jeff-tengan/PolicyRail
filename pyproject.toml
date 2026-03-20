@@ -1,12 +1,13 @@
 [build-system]
-requires = ["setuptools>=68", "wheel"]
+requires = ["setuptools>=77.0.3", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "policyrail-ai"
 dynamic = ["version"]
 description = "Policy-driven guardrails for GenAI runtimes, copilots and agents."
-license = {text = "MIT"}
+license = "MIT"
+license-files = ["LICENSE"]
 readme = "README.md"
 requires-python = ">=3.10"
 authors = [
@@ -30,23 +31,27 @@ classifiers = [
   "Programming Language :: Python :: 3.12",
   "Topic :: Security",
   "Topic :: Software Development :: Libraries :: Python Modules",
-  "License :: OSI Approved :: MIT License",
 ]
 dependencies = []
 
 [project.urls]
-Homepage = "https://github.com/jefftengan/policyrail"
-Repository = "https://github.com/jefftengan/policyrail"
-Issues = "https://github.com/jefftengan/policyrail/issues"
+Homepage = "https://github.com/jeff-tengan/PolicyRail"
+Documentation = "https://github.com/jeff-tengan/PolicyRail#readme"
+Repository = "https://github.com/jeff-tengan/PolicyRail"
+Changelog = "https://github.com/jeff-tengan/PolicyRail/blob/main/CHANGELOG.md"
+Issues = "https://github.com/jeff-tengan/PolicyRail/issues"
 
 [project.optional-dependencies]
 dev = ["pytest>=8.0"]
+release = ["build>=1.2", "twine>=5.1"]
 openai = ["openai>=1.0"]
 azure = ["openai>=1.0", "azure-identity>=1.17"]
 anthropic = ["anthropic>=0.37"]
 google = ["google-genai>=1.0"]
 aws = ["boto3>=1.34"]
 all = [
+  "build>=1.2",
+  "twine>=5.1",
   "openai>=1.0",
   "azure-identity>=1.17",
   "anthropic>=0.37",

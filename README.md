@@ -97,6 +97,12 @@ dependencies = [
 ]
 ```
 
+After publishing to PyPI, installation will be:
+
+```bash
+pip install policyrail-ai
+```
+
 ## Optional Provider Extras
 
 The base package has no mandatory runtime dependencies. Install only the provider extras you need.
@@ -318,6 +324,8 @@ pipeline = SecureGenAIPipeline(
 - Portuguese architecture: [docs/architecture.pt-BR.md](./docs/architecture.pt-BR.md)
 - English concept note: [d-pi-shield.md](./d-pi-shield.md)
 - Portuguese concept note: [d-pi-shield.pt-BR.md](./d-pi-shield.pt-BR.md)
+- Release guide: [RELEASE.md](./RELEASE.md)
+- Changelog: [CHANGELOG.md](./CHANGELOG.md)
 - Executable example: [examples/basic_usage.py](./examples/basic_usage.py)
 - Custom classifier example: [examples/custom_classifier.py](./examples/custom_classifier.py)
 

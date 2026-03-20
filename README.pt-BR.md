@@ -97,6 +97,12 @@ dependencies = [
 ]
 ```
 
+Depois da publicacao no PyPI, a instalacao sera:
+
+```bash
+pip install policyrail-ai
+```
+
 ## Extras Opcionais por Provider
 
 O pacote base nao possui dependencias obrigatorias de runtime. Instale apenas os extras que fizerem sentido para o seu ambiente.
@@ -277,6 +283,8 @@ Primitivas principais:
 - Arquitetura em portugues: [docs/architecture.pt-BR.md](./docs/architecture.pt-BR.md)
 - Nota conceitual em ingles: [d-pi-shield.md](./d-pi-shield.md)
 - Nota conceitual em portugues: [d-pi-shield.pt-BR.md](./d-pi-shield.pt-BR.md)
+- Guia de release: [RELEASE.md](./RELEASE.md)
+- Changelog: [CHANGELOG.md](./CHANGELOG.md)
 - Exemplo executavel: [examples/basic_usage.py](./examples/basic_usage.py)
 - Exemplo de classificador customizado: [examples/custom_classifier.py](./examples/custom_classifier.py)
 
