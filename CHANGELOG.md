@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## 0.7.1 - 2026-03-21
+
+- fixed CI workflow to separate test matrix from build job
+- fixed `[release]` extra to include `pytest` dependency
+- re-release of 0.7.0 due to PyPI upload conflict
+
 ## 0.7.0 - 2026-03-21
 
 - hardened `LightweightNLPClassifier` with 8 new signals covering roleplay escaping, semantic evasion, context delimiter injection, backdoor attempts, credential extraction, and rule-forgetting attacks

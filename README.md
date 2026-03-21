@@ -12,7 +12,7 @@ This repository does not try to be a magical security layer. It provides a compa
 - Package maturity: beta
 - Python support: `3.10+`
 - Canonical documentation language: English
-- Current package version: `0.7.0`
+- Current package version: `0.7.1`
 
 ## Positioning
 
@@ -118,7 +118,7 @@ Consume the package from another project:
 
 ```toml
 dependencies = [
-  "policyrail-ai>=0.7.0,<1.0.0",
+  "policyrail-ai>=0.7.1,<1.0.0",
 ]
 ```
 

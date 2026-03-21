@@ -12,7 +12,7 @@ O repositorio nao tenta vender uma camada "magica" de seguranca. Ele entrega um 
 - maturidade do pacote: beta
 - suporte de Python: `3.10+`
 - idioma canonico da documentacao: ingles
-- versao atual do pacote: `0.7.0`
+- versao atual do pacote: `0.7.1`
 
 ## Posicionamento
 
@@ -118,7 +118,7 @@ Consumir em outro projeto:
 
 ```toml
 dependencies = [
-  "policyrail-ai>=0.7.0,<1.0.0",
+  "policyrail-ai>=0.7.1,<1.0.0",
 ]
 ```
 
