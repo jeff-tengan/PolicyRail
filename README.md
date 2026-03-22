@@ -1,4 +1,4 @@
-# PolicyRail
+# policy-rail
 
 English documentation is the primary reference for this project.
 Portuguese translation: [README.pt-BR.md](./README.pt-BR.md)
