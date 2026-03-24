@@ -27,6 +27,51 @@ flowchart LR
     G --> H["Resposta Segura"]
 ```
 
+## Visao Funcional Detalhada
+
+```mermaid
+flowchart TD
+    A["SecureRequest"] --> B["ContextSanitizer (opcional)<br/>atua apenas no contexto nao confiavel"]
+    B --> C["ContextPartitioner<br/>cria PromptEnvelope com fronteiras de confianca"]
+    C --> D["PromptInjectionDetector<br/>avalia user_input + untrusted_context"]
+    D --> E{"Risco acima do bloqueio?"}
+
+    E -- "Sim" --> F["PolicyEngine<br/>bloqueia antes do LLM"]
+    F --> G["Resposta bloqueada"]
+
+    E -- "Nao" --> H["LLMAdapter<br/>gera texto e possivel ToolCall"]
+    H --> I["PolicyEngine<br/>combina risco + allowlist + sensibilidade"]
+
+    I --> J{"Status da decisao"}
+    J -- "allow" --> K["ToolCall aprovada ou resposta direta"]
+    J -- "review" --> L["Retem tool ou resposta para revisao humana"]
+    J -- "block" --> G
+
+    K --> M{"Existe tool aprovada?"}
+    M -- "Nao" --> P["OutputValidator<br/>verifica vazamento e redacao final"]
+    M -- "Sim" --> N["ToolExecutor"]
+    N --> O["MCPToolExecutor (opcional)<br/>valida inputSchema e executa"]
+    O --> P
+
+    L --> P
+    G --> Q["JsonAuditLogger + EventEmitters"]
+
+    P --> R{"Saida segura?"}
+    R -- "Nao" --> S["Escalona para block<br/>saida retida"]
+    R -- "Sim" --> T["SecureResponse"]
+
+    S --> Q
+    T --> Q
+    Q --> U["Resposta final auditavel"]
+```
+
+Legenda operacional:
+
+- `block`: encerra o fluxo antes da execucao ou segura a saida.
+- `review`: retira autonomia do modelo e exige decisao humana.
+- `allow`: segue apenas quando risco, tool e saida passam pelos controles.
+- `MCPToolExecutor`: entra apenas quando a tool aprovada vier de um servidor MCP.
+
 ## Fluxo de Execucao
 
 1. A entrada do usuario e o contexto nao confiavel passam por um classificador de preflight.

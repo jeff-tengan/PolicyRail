@@ -27,6 +27,51 @@ flowchart LR
     G --> H["Safe Response"]
 ```
 
+## Detailed Functional View
+
+```mermaid
+flowchart TD
+    A["SecureRequest"] --> B["ContextSanitizer (optional)<br/>applies only to untrusted context"]
+    B --> C["ContextPartitioner<br/>builds a PromptEnvelope with trust boundaries"]
+    C --> D["PromptInjectionDetector<br/>scores user_input + untrusted_context"]
+    D --> E{"Risk above block threshold?"}
+
+    E -- "Yes" --> F["PolicyEngine<br/>blocks before the LLM"]
+    F --> G["Blocked response"]
+
+    E -- "No" --> H["LLMAdapter<br/>generates text and optional ToolCall"]
+    H --> I["PolicyEngine<br/>combines risk + allowlist + tool sensitivity"]
+
+    I --> J{"Decision status"}
+    J -- "allow" --> K["Approved ToolCall or direct response"]
+    J -- "review" --> L["Hold tool or answer for human review"]
+    J -- "block" --> G
+
+    K --> M{"Approved tool exists?"}
+    M -- "No" --> P["OutputValidator<br/>checks leaks and final outbound text"]
+    M -- "Yes" --> N["ToolExecutor"]
+    N --> O["MCPToolExecutor (optional)<br/>validates inputSchema and executes"]
+    O --> P
+
+    L --> P
+    G --> Q["JsonAuditLogger + EventEmitters"]
+
+    P --> R{"Output safe?"}
+    R -- "No" --> S["Escalate to block<br/>retain output"]
+    R -- "Yes" --> T["SecureResponse"]
+
+    S --> Q
+    T --> Q
+    Q --> U["Auditable final response"]
+```
+
+Operational legend:
+
+- `block`: stops execution early or withholds unsafe output.
+- `review`: removes model autonomy and requires human approval.
+- `allow`: proceeds only when risk, tool policy, and output checks all pass.
+- `MCPToolExecutor`: appears only when the approved tool is backed by an MCP server.
+
 ## Runtime Flow
 
 1. User input and untrusted context are inspected by a preflight classifier.
