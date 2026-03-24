@@ -1,4 +1,4 @@
-# PolicyRail
+# policy-rail
 
 English documentation is the canonical reference for this project.
 Versao principal em ingles: [README.md](./README.md)
